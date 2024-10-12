@@ -1,2 +1,5 @@
-# projeto-final-pdi
-Projeto Final do Curso de Processamento Digital de Imagens
+# Comparação de Técnicas de Pré-processamento de Imagens para Reconhecimento de Placas Veiculares Usando OCR: Avaliação de Desempenho e Precisão
+
+O uso crescente de soluções de Inteligência Artificial resultou em uma explosão na captura de imagens e sua aplicação em modelos de aprendizado de máquina. No entanto, a falta de padronização na qualidade das imagens gera inconsistências nos resultados desses modelos. Para mitigar esse problema, o Reconhecimento Óptico de Caracteres (OCR) é frequentemente utilizado como uma técnica de pré-processamento, mas ainda enfrenta desafios em cenários com iluminação inadequada, baixa resolução e distorções de perspectiva.
+
+Este trabalho visa explorar e avaliar diversas técnicas de pré-processamento, como conversão para escala de cinza, CLAHE em RGB e Filtro Bilateral, aplicadas ao reconhecimento de placas veiculares. Cada técnica é analisada individualmente e em combinação, utilizando métricas como acurácia, precisão, recall, F1-score, curva ROC, AUC e ANOVA, com o objetivo de identificar o método mais eficaz. O estudo utiliza um conjunto de dados de placas de veículos brasileiros, amplamente utilizado em aplicações de OCR. A pesquisa contribui com uma análise detalhada das melhores práticas de pré-processamento, oferecendo insights para otimizar o desempenho do OCR em cenários reais.
