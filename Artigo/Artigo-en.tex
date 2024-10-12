@@ -1,0 +1,480 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}  % Change language to English
+\usepackage[T1]{fontenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125em}}
+
+\begin{document}
+	
+	\title{Comparison of Image Preprocessing Techniques for License Plate Recognition Using OCR: Performance and Accuracy Evaluation}
+	
+	\author{\IEEEauthorblockN{1\textsuperscript{st} Renato Augusto Tavares}
+		\IEEEauthorblockA{\textit{Institute of Informatics} \\
+			\textit{Federal University of Goiás} \\
+			Goiânia, Goiás \\
+			rat@discente.ufg.br}
+		
+		\and
+		\IEEEauthorblockN{2\textsuperscript{nd} Ronaldo Martins da Costa}
+		\IEEEauthorblockA{\textit{Institute of Informatics} \\
+			\textit{Federal University of Goiás} \\
+			Goiânia, Goiás \\
+			ronaldocosta@ufg.br}}
+	
+	\maketitle
+	
+	\begin{abstract}
+		The growing use of Artificial Intelligence solutions has resulted in an exponential increase in image capture and their application in machine learning models. However, the lack of standardization in image quality generates inconsistencies in the results of these models. To mitigate this problem, Optical Character Recognition (OCR) is often used as a preprocessing technique, but it still faces challenges in scenarios with poor lighting, low resolution, and perspective distortions.
+		
+		This work aims to explore and evaluate several image preprocessing techniques, such as grayscale conversion, CLAHE in RGB, and Bilateral Filter, applied to license plate recognition. Each technique is analyzed individually and in combination, using metrics such as accuracy, precision, recall, F1-score, ROC curve, AUC, and ANOVA, to identify the most effective method. The study uses a dataset of Brazilian vehicle license plates, commonly used in OCR applications. The research provides a detailed analysis of the best preprocessing practices, offering insights to optimize OCR performance in real-world scenarios.
+	\end{abstract}
+	
+	\begin{IEEEkeywords} 
+		OCR, optical character recognition, vehicle license plates, image preprocessing, artificial intelligence
+	\end{IEEEkeywords}
+	
+	\section{Introduction}
+	With the increased use of Artificial Intelligence solutions, image capture and their subsequent application in machine learning models have grown exponentially. However, the quality and technique used to capture these images are not standardized, resulting in inconsistent or incoherent results in Artificial Intelligence models. To mitigate this problem, researchers often resort to OCR (Optical Character Recognition) techniques to preprocess images before using them in machine learning models to ensure greater accuracy in results.
+	
+	The initial concept of OCR was developed in the 1920s by Emanuel Goldberg, but only in the 1970s did more advanced techniques emerge, with contributions from Ray Kurzweil. Despite more than 50 years of technological evolution, OCR still faces significant challenges in pattern detection, especially when conditions are not ideal. Factors such as poor lighting, low resolution, image noise, and distortions caused by perspective or angle continue to hinder OCR performance. These limitations are particularly evident in real-world scenarios, such as license plate recognition, where systems must deal with a wide range of environmental conditions.
+	
+	The objective of this work is to address these limitations by answering research questions related to the state-of-the-art in OCR and testing various image preprocessing techniques, such as Grayscale Conversion, CLAHE (Contrast Limited Adaptive Histogram Equalization) in RGB, Bilateral Filter, among others. These techniques will be evaluated both individually and in combination to determine which offers the best results in terms of accuracy and efficiency in license plate recognition. To ensure the validity of the results, mathematical metrics such as accuracy, precision, recall, F1-score, ROC curve, AUC, and ANOVA were used, allowing a rigorous quantitative analysis of the performance of each preprocessing technique.
+	
+	To make the work replicable, we chose to use a dataset of Brazilian vehicle license plates, a common application for OCR. Vehicle license plate detection is widely explored in studies involving neural networks, as demonstrated in recent works, including "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1} and "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR" \cite{b2}. These papers show how different OCR techniques can be applied to license plate recognition in real-world conditions, serving as the basis for our dataset choice and methodology.
+	
+	Furthermore, the decision to work with DSLR camera captures at different distances and lighting conditions allows us to test how OCR behaves in scenarios where image quality can vary significantly, as addressed in "Deep Learning Model for Automatic Number License Plate Detection and Recognition System" \cite{b3}. The use of different focal lengths is also aligned with research on capturing plates at different angles and distances, enabling a comprehensive analysis of the impact of these variations on OCR performance.
+	
+	Therefore, this study aims not only to identify the most effective preprocessing technique but also to provide a set of best practices for researchers working with license plate recognition and other OCR applications. By combining a rigorous validation process with a realistic dataset and advanced preprocessing techniques, we hope to offer a significant contribution to the field of Optical Character Recognition, with potential impact on the traffic monitoring, vehicle security, and urban automation industries.
+	
+	\section{Research Methodology}
+	
+	Systematic literature reviews have become increasingly relevant in academic research because they follow a structured, rigorous, and reliable methodology for literature search and analysis. This type of review allows the reader to quickly and effectively obtain a panoramic view of the field of study \cite{b4}. Used to deepen knowledge in specific areas, systematic reviews also make it possible to identify gaps and opportunities for future investigations. The main goal of this approach is to locate, interpret, evaluate, and classify all relevant articles related to the research questions.
+	
+	In this study, a five-step systematic review process was adopted, aiming to map the existing literature, define research questions, and identify relevant keywords. Figure~\ref{img1} and Figure~\ref{img2} show the stages followed during the review, while Figure~\ref{img3} illustrates the number of articles analyzed throughout the process.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img1.png}}
+		\caption{Stages of the systematic literature review.}
+		\label{img1}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics{img2.png}}
+		\caption{Stages of the systematic literature review.}
+		\label{img2}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics{img3.png}}
+		\caption{Number of articles reviewed according to search results.}
+		\label{img3}
+	\end{figure}
+	
+	\section{Research Questions}
+	
+	The research questions were formulated to precisely determine the purpose considering the study's scope. The research questions of this study are as follows:
+	
+	\begin{itemize}
+		\item \textbf{RQ1:} How is the detection of vehicle plate characters performed in the current state of the art?
+		\item \textbf{RQ2:} Is there an image processing algorithm that can provide 100\% accuracy in plate character recognition?
+		\item \textbf{RQ3:} How can the use of OCR techniques ensure accurate and efficient vehicle plate identification under different lighting conditions and capture angles?
+		\item \textbf{RQ4:} What is the success rate of the automated vehicle license plate recognition system using OCR?
+	\end{itemize}
+	
+	Figure~\ref{img3} illustrates the filtering process of the articles identified using the search string in the IEEE Digital Library. Initially, 190 articles were found. After applying exclusion criteria, 42 articles were discarded for not meeting the selection requirements. Next, all duplicate articles were removed, ensuring that only relevant studies were maintained in the final selection.
+	
+	\section{Statistical Evaluation Metrics Used}
+	
+	As mentioned in the introduction, it is essential to thoroughly understand image preprocessing algorithms to significantly improve the accuracy of character recognition systems. The effective training of Artificial Intelligence (AI) systems, as well as the development of advanced technologies like autonomous vehicles, automatic traffic sign identification systems, and fully automated drone flights, depends on highly accurate OCR algorithms. Errors in these systems can not only cause financial losses but also put lives at risk, highlighting the importance of improving these processes.
+	
+	This section will discuss the five preprocessing algorithms applied in this work, detailing their advantages, disadvantages, and the scenarios where each performs better, as well as those in which their use is less efficient. The goal is to establish a robust set of statistical metrics, providing a clear and well-founded quantitative analysis that can serve as a reference for researchers and developers looking to train AIs using OCR.
+	
+	Among the algorithms used are techniques such as Grayscale Conversion and CLAHE (Contrast Limited Adaptive Histogram Equalization) in RGB images, widely recognized for improving contrast and the visibility of important details, as demonstrated in previous studies on license plate recognition [1]. Additionally, the Bilateral Filter was tested, known for its effectiveness in noise reduction without compromising image edges, which is particularly relevant in poor lighting or damaged plates.
+	
+	Previous studies, such as "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1} and "Deep Learning Model for Automatic Number License Plate Detection and Recognition System" \cite{b2}, have already demonstrated the importance of these techniques in improving accuracy in OCR systems, especially when applied to images of plates captured under varied conditions, such as different angles, distances, and irregular lighting. By exploring these approaches, this study seeks to determine which preprocessing technique offers the best results in terms of accuracy, precision, recall, and F1-score, as well as identify the limitations of each method in specific situations.
+	
+	At the end of this analysis, we expect to offer a viable and scientifically grounded solution for researchers and engineers who need to optimize character recognition in their AI applications, whether for traffic monitoring systems, vehicle automation, or other critical scenarios where accuracy is essential for safety and efficiency.
+	
+	For a better understanding of the article, we will define some metrics used in the text.
+	
+	\subsection{Accuracy}
+	
+	\textbf{Accuracy} is an evaluation metric used to measure the effectiveness of a classification model. It represents the fraction of correct predictions over the total predictions made by the model. Accuracy is an important metric in cases where the classes are balanced, meaning the number of positive and negative cases is approximately the same.
+	
+	The formula to calculate accuracy is:
+	
+	\[
+	\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{TP} (True Positives) are correct predictions for the positive class (correctly predicted plates).
+		\item \textbf{TN} (True Negatives) are correct predictions for the negative class (plates that were not incorrectly predicted).
+		\item \textbf{FP} (False Positives) are incorrect predictions for the positive class (incorrect plates predicted as correct).
+		\item \textbf{FN} (False Negatives) are incorrect predictions for the negative class (correct plates predicted incorrectly).
+	\end{itemize}
+	
+	\subsection{Precision}
+	
+	\textbf{Precision} is an evaluation metric that indicates the proportion of correct positive predictions in relation to the total positive predictions made by the model. Precision is useful in situations where the cost of false positives is high, meaning it is important to minimize errors in positive predictions.
+	
+	The formula for precision is:
+	
+	\[
+	\text{Precision} = \frac{TP}{TP + FP}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{TP} (True Positives) are correct predictions for the positive class (correctly predicted plates).
+		\item \textbf{FP} (False Positives) are incorrect predictions for the positive class (plates predicted as correct, but are incorrect).
+	\end{itemize}
+	
+	\subsection{Recall (Sensitivity)}
+	
+	\textbf{Recall}, also known as sensitivity or true positive rate, measures the model's ability to correctly identify positive instances (in this case, correctly predicted plates). Recall is particularly important when the goal is to minimize false negatives, meaning it is crucial to detect all positive cases.
+	
+	The formula for \textbf{Recall} is:
+	
+	\[
+	\text{Recall} = \frac{TP}{TP + FN}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{TP} (True Positives) are correct predictions for the positive class (correctly predicted plates).
+		\item \textbf{FN} (False Negatives) are incorrect predictions for the negative class (plates that should have been predicted as correct but were predicted incorrectly).
+	\end{itemize}
+	
+	In practical terms, \textbf{Recall} measures the proportion of true positives identified in relation to the total instances that actually belong to the positive class.
+	
+	\subsection{F1-score}
+	
+	The \textbf{F1-score} is a metric that combines \textbf{precision} and \textbf{recall} into a single measure. It is especially useful when there is a balance between the importance of minimizing both false positives and false negatives. The \textbf{F1-score} is the harmonic mean between precision and recall, offering a balanced view of the model's performance.
+	
+	The formula for \textbf{F1-score} is:
+	
+	\[
+	F1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{Precision} measures the proportion of correct positive predictions in relation to the total positive predictions made.
+		\item \textbf{Recall} measures the proportion of positive instances that were correctly identified.
+	\end{itemize}
+	
+	The \textbf{F1-score} ranges from 0 to 1, where 1 indicates the best possible performance (perfect precision and recall), and 0 indicates the worst performance.
+	
+	\subsection{ROC Curve and AUC (Area Under the Curve)}
+	
+	The \textbf{ROC (Receiver Operating Characteristic) Curve} is a graphical tool used to evaluate the performance of a binary classifier. It shows the relationship between the \textbf{True Positive Rate (TPR)} and the \textbf{False Positive Rate (FPR)} as the model's decision threshold varies. The ROC curve is useful for visualizing model performance at different sensitivity levels.
+	
+	The \textbf{True Positive Rate} (or Recall) is given by:
+	
+	\[
+	\text{TPR} = \frac{TP}{TP + FN}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{TP} (True Positives) are the true positive examples (correct predictions for the positive class).
+		\item \textbf{FN} (False Negatives) are the true positive examples that the model incorrectly predicted as negative.
+	\end{itemize}
+	
+	The \textbf{False Positive Rate (FPR)} is given by:
+	
+	\[
+	\text{FPR} = \frac{FP}{FP + TN}
+	\]
+	
+	Where:
+	
+	\begin{itemize}
+		\item \textbf{FP} (False Positives) are the examples incorrectly predicted as positive.
+		\item \textbf{TN} (True Negatives) are the true negative examples (correct predictions for the negative class).
+	\end{itemize}
+	
+	The \textbf{AUC (Area Under the ROC Curve)} is a measure that summarizes the overall performance of the classifier. It ranges from 0 to 1, where:
+	
+	\begin{itemize}
+		\item A value of \textbf{1.0} indicates a perfect classifier that correctly predicts all instances.
+		\item A value of \textbf{0.5} indicates a classifier with no predictive power (equivalent to random guessing).
+	\end{itemize}
+	
+	The AUC formula does not have a direct representation but is defined as the area under the ROC curve, calculated numerically.
+	
+	\section{Preprocessing Algorithms Used}
+	
+	
+	\subsection{No Preprocessing - EasyOCR}
+	
+	The first algorithm tested in this study, in fact, did not involve any preprocessing technique. Initially, we decided to run EasyOCR directly on the raw images from the dataset, without any prior treatment, to observe how the OCR system would react to the original conditions of the images and evaluate the accuracy rate of the library before applying improvement techniques. This procedure is essential to establish a baseline for OCR performance and verify if subsequent preprocessing techniques bring significant improvements.
+	
+	EasyOCR is an open-source library created by the team at Jaided AI, actively maintained by the community and its original developers. It was designed to be an efficient and easy-to-use solution for recognizing text in images, supporting over 80 languages. Its source code is publicly available on GitHub, allowing researchers and software engineers to contribute to its development or adapt the library to specific needs of their applications.
+	
+	One of the major advantages of EasyOCR is its simplicity of use and flexibility to work with different datasets and image conditions. The library uses a combination of Convolutional Neural Networks (CNNs) and Recurrent Neural Networks (RNNs) for character detection and recognition, and it is highly efficient in dealing with printed characters in regular fonts, such as vehicle license plates or documents. Furthermore, EasyOCR is known for its ability to process text in different languages without extensive configurations, making it a popular choice in various text recognition scenarios.
+	
+	However, EasyOCR also presents some limitations. Its performance can be hampered when dealing with low-quality images, especially those with significant noise, poor lighting, or perspective distortions, as often occurs in traffic or outdoor environments. These shortcomings make preprocessing critical to improving results in many scenarios, as explored in our study and in works like "Automatic Vehicle License Plate Recognition Using Lightweight Deep Learning Approach" \cite{b5}, which shows that lighter solutions may be suitable in certain scenarios, but may require improvements in preprocessing to achieve optimal results. Additionally, studies such as "Cognitive Number Plate Recognition using Machine Learning and Data Visualization Techniques" \cite{b6} indicate that complementary techniques, such as data visualization, can be integrated with OCRs like EasyOCR to optimize result interpretation in large data volumes.
+	
+	EasyOCR is widely used in various practical application scenarios, including reading vehicle license plates in traffic monitoring systems, document digitization, and even reading street signs and advertisements. These scenarios benefit from EasyOCR's ability to efficiently recognize text in images with different resolutions and formats. However, to ensure robust recognition in more complex conditions, such as worn plates, reflections, or unfavorable angles, it is necessary to apply image preprocessing techniques, as we will see in the following sections.
+	
+	In summary, EasyOCR serves as an effective baseline tool for character recognition, but its performance in real-world scenarios can be significantly improved with the use of appropriate preprocessing techniques. Its versatility and open-source nature make it an attractive choice for a wide range of applications, and its continuous use and maintenance by the community ensure that it continues to evolve to meet the needs of academic and industrial research.
+	
+	The first statistical metric we used was \textbf{accuracy}, which is an evaluation metric used to measure the effectiveness of a classification model. It represents the fraction of correct predictions over the total predictions made by the model. Accuracy is an important metric in cases where the classes are balanced, meaning the number of positive and negative cases is approximately the same.
+	
+	In this case, \textbf{accuracy} was calculated by comparing the Correct Plate column with the Predicted Plate column. The proportion of correct predictions was approximately \textbf{71.7\%}. This means that the model correctly predicted about \textbf{71.7\%} of the vehicle license plates.
+	
+	The second metric used was \textbf{precision}, which was calculated by comparing the Correct Plate column with the Predicted Plate column. The proportion of correct positive predictions was \textbf{71.7\%}, meaning that among all the predictions made as positive (correctly detected plates), approximately \textbf{71.7\%} were correct.
+	
+	The third metric used was the \textbf{F1-score}, as both precision and \textbf{recall} were calculated as \textbf{71.7\%}. Substituting these values into the F1-score formula:
+	
+	\[
+	F1 = 2 \times \frac{0.717 \times 0.717}{0.717 + 0.717} = 0.717
+	\]
+	
+	Thus, the \textbf{F1-score} obtained was \textbf{71.7\%}, reflecting a balance between precision and recall. This indicates that the model has balanced performance in detecting plates correctly and minimizing errors.
+	
+	The fourth metric used to compare the models was the \textbf{ROC Curve}, generated from the comparison between the correct and predicted plates. In our case, the \textbf{AUC} was \textbf{1.0}, indicating that the model was able to perfectly classify all instances without errors. 
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img4.png}}
+		\caption{The ROC curve was generated with an AUC (Area Under the Curve) of 1.0.}
+		\label{img4}
+	\end{figure}
+	
+	This result indicates excellent model performance, as it was able to correctly distinguish all plates with \textbf{no false positives} or \textbf{false negatives}.
+	
+	The \textbf{arithmetic mean} of the model's execution time was \textbf{7.26 seconds}, representing the average value considering all recorded execution times. The \textbf{median} was \textbf{6.59 seconds}, indicating the central point of the times, which may be a more representative measure if there are extreme values that distort the average.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img5.png}}
+		\caption{The arithmetic mean and median of the model's execution time.}
+		\label{img5}
+	\end{figure}
+	
+	In Figure~\ref{img5} above, you can see the visual comparison between the mean and median. The difference between the two values indicates that, although the average time is slightly higher, the median, which is less sensitive to outliers, shows a more typical time that the models tend to achieve.
+	
+	Below in Figure~\ref{img6} is the Gaussian distribution of the model's execution times, overlaid on the histogram of the actual data. The blue curve represents the theoretical Gaussian distribution based on the mean and standard deviation of the execution times. The green histogram shows how the execution times are distributed in practice.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img6.png}}
+		\caption{Gaussian Distribution of Execution Times.}
+		\label{img6}
+	\end{figure}
+	
+	This visualization helps identify whether the execution times approximately follow a normal (Gaussian) distribution or if there are significant deviations.
+	
+	\subsection{Grayscale - EasyOCR}
+	
+	The second preprocessing algorithm used in this study was \textbf{Grayscale Conversion}. The goal was to evaluate how the dataset would behave under this technique and compare the accuracy rate with the results obtained when using EasyOCR without any preprocessing. Grayscale conversion is a simple and widely used technique in image processing because it reduces the complexity of the information present in an image by eliminating colors, retaining only the pixel intensity. However, the results indicated that for our dataset, this technique did not offer improvements.
+	
+	Specifically, we observed that \textbf{accuracy} — which represents the fraction of correct predictions in relation to the total predictions made — dropped from \textbf{71.7\%} (without preprocessing) to \textbf{70.75\%} when we applied grayscale. This suggests that by removing color information, the model lost some ability to distinguish certain important visual patterns for character recognition. This result contrasts with other situations where grayscale can be beneficial, such as in recognizing simple text where color does not play a significant role.
+	
+	Another indicator that saw a slight degradation was \textbf{precision}, which dropped from \textbf{71.7\%} without preprocessing to \textbf{70.75\%} when using grayscale. Precision measures the proportion of true positives in relation to the total positive predictions made by the model. The small drop indicates that the model had more difficulty making correct predictions by eliminating color information. In other contexts, such as described in the study "A Hybrid Deep Learning Algorithm for License Plate Detection and Recognition in Vehicle-to-Vehicle Communications" \cite{b7}, grayscale can be effective when working with images in controlled environments or with uniform lighting. However, in our scenario, which involves variation in lighting conditions and capture angles, the absence of color appears to have been a negative factor.
+	
+	The \textbf{recall} — which corresponds to the proportion of correctly detected plates in relation to the total real plates in the dataset — also saw a slight drop, going from \textbf{71.7\%} (without preprocessing) to \textbf{70.75\%} with grayscale. Recall is important for evaluating the model's ability to correctly detect all instances of plates present, and this decrease indicates that the model may have failed to capture certain characters in adverse conditions, such as worn or partially obstructed plates.
+	
+	The harmonic mean between precision and recall, known as the \textbf{F1-score}, was also impacted, reaching \textbf{70.75\%} after applying grayscale preprocessing, compared to the \textbf{71.7\%} obtained without preprocessing. This metric is particularly useful in plate recognition scenarios, where the goal is to balance the model's ability to be precise (not generate false positives) and complete (not miss detecting plates). The negative impact of grayscale conversion in this case suggests that color is an important feature in our specific dataset, reinforcing the need to carefully evaluate the context when applying this technique.
+	
+	The \textbf{ROC (Receiver Operating Characteristic) Curve} and \textbf{AUC (Area Under the Curve)} remained unchanged from the model without preprocessing, which was expected given that our dataset involves only the prediction of a single plate at a time, without the need for probabilistic calculation. As a result, the model's behavior, both with grayscale and without preprocessing, remained identical in this respect, as observed in other related studies, such as "License Plate Recognition System Based on Improved YOLOv5 and GRU" \cite{b8}, where ROC/AUC also remained stable in scenarios with few predicted classes.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img7.png}}
+		\caption{The ROC Curve (Receiver Operating Characteristic) and AUC (Area Under the Curve) remained unchanged.}
+		\label{img7}
+	\end{figure}
+	
+	Grayscale conversion has some important advantages. One of them is simplicity and the reduction in the volume of image data, which can speed up processing and save computational resources. In scenarios where color does not play an important role, such as document digitization or text recognition in standard fonts, grayscale can be highly efficient.
+	
+	On the other hand, one of the main disadvantages is that, in complex scenarios such as vehicle license plate recognition under different lighting conditions, angles, and wear, removing color can hinder the recognition of crucial details. These challenges are especially relevant when plates have contrasting background colors and characters, which help the model better distinguish patterns.
+	
+	Grayscale is widely used in printed documents, where color does not influence reading, and in basic computer vision applications where the goal is to reduce the amount of visual information to be processed. However, in \textbf{vehicle license plate recognition systems}, especially those in dynamic environments with varying light and angles, color can be essential for OCR accuracy and reliability.
+	
+	Alternatively, one could argue in favor of grayscale conversion by stating that the processing time for a grayscale image is theoretically faster than for a colored image. This is because grayscale images have only a single layer of pixel intensity, while colored images, typically in RGB format, have three layers (red, green, and blue), which naturally increases the amount of data to be processed. This reduction in complexity in grayscale images should therefore result in faster performance for character recognition algorithms like EasyOCR.
+	
+	However, when we look at the practical results, the data contradicts this expectation. The average execution time for the model when processing grayscale images was approximately \textbf{8.88 seconds}, with a median of \textbf{7.01 seconds}. In contrast, when using EasyOCR with colored images, the execution time averaged \textbf{7.26 seconds}, while the median was \textbf{6.59 seconds}. These numbers reveal that processing colored images surprisingly resulted in faster performance than processing grayscale images.
+	
+	This result can be explained by several factors. First, although grayscale reduces the amount of data in an image, the process of converting to grayscale adds an extra step to the image processing pipeline. Additionally, EasyOCR is optimized to work with colored images, where color information can help the model differentiate between the background and characters, reducing the computational effort needed to distinguish the letters or numbers present in the image. As described in "Cognitive Number Plate Recognition using Machine Learning and Data Visualization Techniques" \cite{b6}, preserving color characteristics in certain cases can be beneficial, even if it slightly increases the amount of data processed, as it can improve character segmentation and the overall clarity of the image.
+	
+	In addition, the execution time of an OCR model is not solely determined by the amount of visual data but also by the model's ability to interpret and recognize patterns efficiently. In "Automatic Vehicle License Plate Recognition Using Lightweight Deep Learning Approach" \cite{b5}, for example, it was shown that lighter models, even with less data to process, do not necessarily result in greater speed if the algorithm cannot clearly identify the patterns. This principle also applies here, as EasyOCR, when using colored images, may be benefiting from the additional color information to perform more precise and, consequently, faster character detection.
+	
+	In summary, while theoretically using grayscale should reduce processing time, the data shows that EasyOCR, when used with colored images, offers superior performance in terms of execution speed. This result demonstrates that OCR processing efficiency does not depend solely on the amount of visual data, but also on the optimization of the algorithm for different types of images.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img8.png}}
+		\caption{The arithmetic mean and median of the model's execution time.}
+		\label{img8}
+	\end{figure}
+	
+	
+	\subsection{CLAHE in RGB - EasyOCR}
+	
+	
+	The third preprocessing algorithm we applied in this study was \textbf{CLAHE (Contrast Limited Adaptive Histogram Equalization)}, an adaptive histogram equalization technique with contrast limitation, widely used to enhance contrast in images with uneven lighting. The goal of this technique is to enhance visual details, especially in areas with low intensity variation, without excessively amplifying image noise. Thus, we sought to evaluate how the dataset would behave when applying CLAHE and compare it with the results obtained using EasyOCR without any preprocessing.
+	
+	When observing the results, we found that \textbf{accuracy} — the fraction of correct predictions in relation to the total predictions made — dropped slightly from \textbf{71.7\%} (without preprocessing) to \textbf{70,75\%} after applying CLAHE. Although the technique is effective in improving the visibility of details in some images, it seems that, in our case, CLAHE did not bring significant benefits, especially in plates that already had reasonable contrast. This result suggests that in environments with high lighting variation, CLAHE may not be the best preprocessing option, as also discussed in the study "Design of IoT Based Automatic Number Plate Recognition" \cite{b10}, where lighting plays a critical role.
+	
+	In addition to accuracy, we also observed a slight drop in \textbf{precision}, which went from \textbf{71.7\%} without preprocessing to \textbf{70.75\%} when using CLAHE. Precision is a metric that measures the proportion of correct predictions in relation to the total positive predictions. The drop suggests that the model with CLAHE produced more false positives or had difficulty correctly distinguishing characters under certain conditions, such as when plates were in adverse lighting conditions. While CLAHE is a powerful tool for enhancing details in low-contrast images, it can also introduce artifacts that confuse the OCR algorithm, especially in noisy images, as mentioned in "Deep Learning-Based Bangladeshi License Plate Recognition System" \cite{b11}.
+	
+	The \textbf{recall} — which measures the proportion of correctly detected plates in relation to the total plates present — also saw a slight degradation, dropping from \textbf{71.7\%} (without preprocessing) to \textbf{70.75\%}. This means that CLAHE did not increase the system's sensitivity to detect all plates present in the dataset, reinforcing the conclusion that contrast enhancement was not sufficient to overcome the challenges inherent to the capture conditions of the images.
+	
+	Consequently, the \textbf{F1-score}, which is the harmonic mean between precision and recall, also dropped, reaching \textbf{70.75\%}. As the F1-score is a metric that balances these two factors, its drop reflects the overall degradation of performance when applying CLAHE as preprocessing. This result is consistent with the literature, which highlights that CLAHE may not be ideal for all types of images, being more effective in scenarios where contrast is the main limitation, as shown in "A Framework for Automatic Detection of Traffic Violations" \cite{b12}.
+	
+	The \textbf{ROC Curve (Receiver Operating Characteristic)} and \textbf{AUC (Area Under the Curve)} are important metrics for evaluating a model's ability to correctly classify instances, especially in binary classification problems. However, in our study, where each prediction refers to a single plate, without an underlying probabilistic model, these metrics remained unchanged. CLAHE did not impact the ROC curve or AUC, as expected, since the model's configuration remained the same, and the analysis was conducted based on a deterministic scenario. The calculation of the ROC curve and AUC yielded identical results to the original model that used EasyOCR without preprocessing, suggesting that these metrics did not capture significant improvements or deteriorations with the application of CLAHE.
+	
+	Another important factor to consider is the \textbf{execution time}. When using EasyOCR with colored images without preprocessing, the average execution time was \textbf{7.26 seconds}, with a median of \textbf{6.59 seconds}. However, when applying CLAHE as preprocessing, the average time increased to \textbf{8.87 seconds}, with a median of \textbf{7.13 seconds}. This demonstrates that CLAHE added a computational overhead to the process, increasing the model's execution time. Although the difference is not drastic, it suggests that the use of CLAHE should be carefully considered when processing time is a critical variable in real-time applications, such as license plate recognition systems on busy roads.
+	
+	Compared to the results obtained using grayscale, we noted that CLAHE brought minimal changes in performance metrics and processing time. The expected gain in contrast did not translate into a significant improvement in the accuracy or recall of the OCR model, indicating that for this specific dataset, CLAHE did not offer real advantages. Similar results were observed in "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13}, where contrast adjustment techniques were also insufficient to improve character recognition in environments with extreme lighting variation.
+	
+	\textbf{CLAHE}'s strength lies in its ability to improve contrast in low-quality images, particularly useful in environments with lighting variations that impair character visibility, such as vehicle license plates under weak light or reflections. However, one of its \textbf{main weaknesses} is that this technique can introduce \textbf{visual artifacts} when applied to images that already have acceptable contrast or when there is too much noise, which can harm the performance of OCR algorithms like EasyOCR. Moreover, the increase in processing time observed with CLAHE may also be a limiting factor in systems that require high efficiency.
+	
+	CLAHE is widely used in \textbf{medical imaging}, where enhancing details in dark areas is essential, and in \textbf{security image processing}, where visibility in low-light conditions is critical. However, in \textbf{vehicle license plate recognition systems}, the use of CLAHE should be carefully evaluated, especially in contexts where lighting conditions are not the limiting factor or where there is significant variation in capture conditions, such as angles, distances, and outdoor environments.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img10.png}}
+		\caption{The ROC Curve (Receiver Operating Characteristic) and AUC (Area Under the Curve) remained unchanged.}
+		\label{img10}
+	\end{figure}
+	
+	\subsection{Bilateral Filter - EasyOCR}
+	
+	
+	The fourth preprocessing algorithm used in this study was the \textbf{bilateral filter}, aimed at verifying how the dataset would behave compared to using EasyOCR without any preprocessing. The bilateral filter is a non-linear smoothing technique that preserves image edges while reducing noise without eliminating important details. Unlike other smoothing filters, such as the mean or median filter, the bilateral filter is effective in smoothing homogeneous areas of the image while preserving edges, which can be useful for character recognition in noisy environments. However, our experiments indicated that the application of the bilateral filter did not bring significant improvements.
+	
+	Specifically, \textbf{accuracy} — defined as the fraction of correct predictions in relation to the total predictions made — showed a slight drop, from \textbf{71.7\%} (without preprocessing) to \textbf{70.75\%} with the application of the bilateral filter. This result suggests that while the filter reduced noise present in the images, it may have overly smoothed some important areas, impairing the legibility of the characters by EasyOCR. This degradation in performance is consistent with observations made in studies such as "Automatic Vehicle Entry Control System" \cite{b9}, where the application of excessive smoothing techniques resulted in the loss of critical information for character recognition.
+	
+	The model's \textbf{precision} was also affected, dropping from \textbf{71.7\%} to \textbf{70.75\%} after applying the bilateral filter. Precision measures the proportion of correct predictions among all positive predictions made. This result indicates that the model was less effective in correctly identifying characters without generating false positives, which may be a consequence of smoothing important edges for character segmentation on plates. This effect can be exacerbated in scenarios where plates have fine details or sharp edges, such as in environments with damaged or dirty plates, as discussed in "A Hybrid Deep Learning Algorithm for License Plate Detection and Recognition in Vehicle-to-Vehicle Communications" \cite{b7}.
+	
+	The \textbf{recall} — which evaluates the proportion of correctly detected plates in relation to the total real plates in the dataset — also dropped from \textbf{71.7\%} to \textbf{70.75\%}. This value indicates that the bilateral filter, despite being efficient in reducing noise, did not increase the OCR's sensitivity to capture all plates, potentially causing the loss of details that are crucial for correct character identification.
+	
+	As a result of the drops in both precision and recall, the \textbf{F1-score}, which is the harmonic mean between these two metrics, also suffered a slight degradation, reaching \textbf{70.75\%}. The F1-score is an essential metric for balancing the need to correctly identify characters without generating too many false positives. These results are in line with what was observed in "License Plate Recognition System Based on Improved YOLOv5 and GRU" \cite{b8}, which suggests that, in some cases, edge smoothing can impair character segmentation and recognition.
+	
+	The \textbf{ROC Curve (Receiver Operating Characteristic)} and \textbf{AUC (Area Under the Curve)} metrics remained unchanged after applying the bilateral filter, as was the case with the other preprocessing methods. In our study, since we are dealing with a dataset with binary predictions for a single plate at a time and without a probabilistic model, these metrics did not undergo significant changes. The ROC curve and the AUC value, which measure the model's ability to distinguish between positive and negative classes, showed the same behavior observed when using EasyOCR without preprocessing, as also highlighted in "Number Plate Detection Using Drone Surveillance" \cite{b15}. This result suggests that the application of the bilateral filter did not have a significant impact on the model's overall ability to distinguish between valid and invalid characters.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img13.png}}
+		\caption{The ROC Curve (Receiver Operating Characteristic) and AUC (Area Under the Curve) remained unchanged.}
+		\label{img13}
+	\end{figure}
+	
+	Another important aspect analyzed was the impact of preprocessing on \textbf{execution time}. When using only EasyOCR, the average execution time was \textbf{7.26 seconds}, with a median of \textbf{6.59 seconds}. However, when applying the bilateral filter, the average time increased to \textbf{7.75 seconds}, with a median of \textbf{6.86 seconds}. This increase in execution time is due to the computational complexity of the bilateral filter, which requires more processing to calculate adaptive smoothing for each pixel in the image while preserving the edges. Although the impact on execution time is not very large, it should be considered in systems where response time is critical, such as real-time monitoring systems, as discussed in "Computer Vision Based Vehicle Detection for Toll Collection System Using Embedded Linux" \cite{b16}.
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img14.png}}
+		\caption{The arithmetic mean and median of the model's execution time.}
+		\label{img14}
+	\end{figure}
+	
+	\begin{figure}[htbp]
+		\centerline{\includegraphics[width=0.5\textwidth]{img15.png}}
+		\caption{Gaussian Distribution of Execution Times.}
+		\label{img15}
+	\end{figure}
+	
+	
+	The \textbf{bilateral filter} has some \textbf{significant advantages} in applications where noise reduction is needed, but edge preservation is equally important. It is particularly useful in images with considerable noise, where other smoothing techniques, such as the median or Gaussian filter, would tend to blur the edges, impairing the detection of important details. However, a clear \textbf{disadvantage} of the bilateral filter is that it can overly smooth the edges when applied improperly, resulting in the loss of crucial details, such as character recognition on vehicle plates. This adverse effect was observed in the results obtained in this study.
+	
+	The bilateral filter is widely used in areas such as \textbf{medical image processing}, where it is essential to reduce noise without losing the anatomical details of the images. It is also effective in \textbf{computer vision applications}, such as \textbf{object recognition} in noisy environments, as discussed in "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR" \cite{b2}. However, in scenarios such as vehicle license plate recognition, where it is crucial to preserve the details of the characters and edges of the plates, the use of the bilateral filter should be carefully evaluated, especially in conjunction with other preprocessing methods that may compensate for the loss of details.
+	
+	\subsection{All Preprocessing Algorithms Combined - EasyOCR}
+	
+	The fifth preprocessing algorithm used in this study was the \textbf{combination of all previously applied methods}: grayscale, CLAHE in RGB, and Bilateral Filter. The goal was to evaluate how the combined application of these algorithms would affect the performance of EasyOCR compared to its use without any preprocessing. The central idea was to verify whether there would be synergy between the methods, enhancing the results. Surprisingly, our experiments showed that this approach brought significant improvements in terms of accuracy and precision.
+	
+	By applying all preprocessing algorithms simultaneously, \textbf{accuracy} — the fraction of correct predictions in relation to the total predictions made — increased from \textbf{71.7\%} (without preprocessing) to \textbf{80.19\%}. This considerable increase demonstrates that while each technique individually presented modest results, their combined application creates a synergistic effect that significantly improves character detection and recognition. This synergy can be explained by the fact that each technique contributes to mitigating a specific limitation: while grayscale simplifies the image and reduces data complexity, CLAHE enhances contrast, and the Bilateral Filter smooths noise without sacrificing edges. This approach has been explored in other studies, such as "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR" \cite{b2}, which highlights the importance of combining different preprocessing methods to address the challenging conditions encountered in real-world scenarios.
+	
+	In addition to accuracy, \textbf{precision} also experienced a significant increase, rising from \textbf{71.7\%} (without preprocessing) to \textbf{80.19\%}. Precision, which measures the proportion of correct positive predictions among positive predictions, was improved by the combined action of preprocessing algorithms. This indicates that, with the combined filters, the EasyOCR model performed much better at avoiding false positives, i.e., correctly identifying the relevant characters on the plates.
+	
+	\textbf{Recall} — which measures the proportion of correctly detected plates in relation to the total plates present in the dataset — also rose to \textbf{80.19\%}, which is a significant increase compared to the \textbf{71.7\%} recall obtained without preprocessing. High recall indicates that the model was able to detect most plates much more efficiently, which is crucial in OCR applications where missing information can significantly impair system performance. This combined preprocessing approach has already been advocated in "Cognitive Number Plate Recognition using Machine Learning and Data Visualization Techniques" \cite{b6}, where the use of diverse image processing techniques helped improve recognition performance in variable conditions.
+	
+	Consequently, the \textbf{F1-score}, which is the harmonic mean between precision and recall, also increased to \textbf{80.19\%}. This increase shows that the combination of algorithms provided a better balance between the ability to avoid false positives (precision) and correctly detecting all plates (recall). The F1-score, as a balance metric, reinforces that the simultaneous application of the three algorithms was efficient in improving the overall performance of the model.
+	
+	The \textbf{ROC Curve (Receiver Operating Characteristic)} and \textbf{AUC (Area Under the Curve)} metrics, commonly used to assess a model's discriminative ability, remained unchanged. This is because our dataset works with binary predictions for a single plate at a time, without a probabilistic component. The behavior of the ROC curve and AUC remained identical to that observed when using EasyOCR without preprocessing. Although these metrics were not impacted, the improvements observed in the other metrics are evidence of the success of the combined filter application.
+	
+	Another surprising result was that the \textbf{execution time} was not significantly impacted by the simultaneous application of all preprocessing algorithms. The average execution time remained at \textbf{7.26 seconds}, the same value observed when EasyOCR was used without preprocessing. The median execution time increased slightly from \textbf{6.59 seconds} to \textbf{6.86 seconds} with all filters applied simultaneously. This marginal increase in execution time is justified by the substantial improvement in accuracy and other data, suggesting that the combination of algorithms is efficient not only in terms of result quality but also in terms of processing time. The study "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13} corroborates this type of behavior, where optimized preprocessing does not significantly compromise the model's temporal efficiency.
+	
+	The use of a combination of preprocessing algorithms offers clear \textbf{strengths}, such as the substantial increase in accuracy and precision without compromising execution time. The synergy between the different techniques allows each to compensate for the other's limitations, providing a final result that surpasses the use of any method individually. Additionally, this approach is flexible and can be applied in a variety of scenarios, from vehicle license plate recognition in urban environments to the digitization of low-quality printed documents.
+	
+	However, one \textbf{weakness} of this approach is that, in some situations, applying too many filters can lead to overprocessing, excessively smoothing details or introducing unwanted artifacts, especially in high-quality captured images. Furthermore, in systems that require real-time processing of large volumes of data, such as toll or surveillance systems, adding multiple preprocessing steps may represent a computational burden in scenarios where response time must be minimal. Managing this trade-off between precision and efficiency should be carefully considered.
+	
+	This combined approach is particularly effective in scenarios where image quality is highly variable, and the environment presents challenges such as poor lighting, worn plates, or unfavorable angles. In \textbf{automatic vehicle license plate recognition systems} or \textbf{OCR applications for outdoor environments}, combining techniques such as grayscale, CLAHE, and Bilateral Filter may be the ideal solution to ensure the best possible recognition quality, even in adverse conditions. This approach can also be extended to text recognition in scanned documents of low print quality, as explored in "A Framework for Automatic Detection of Traffic Violations" \cite{b12}.
+	
+	\section{Conclusion}
+	
+	This study aimed to analyze and compare the impact of different preprocessing algorithms on the performance of the EasyOCR system applied to vehicle license plate recognition. We used widely known techniques such as grayscale conversion, CLAHE in RGB, and Bilateral Filter, both individually and in combination, to verify how these approaches would affect the model's accuracy, precision, recall, and F1-score. Through a series of detailed experiments, we were able to identify the advantages and disadvantages of each method, as well as the synergistic effect achieved by using all these techniques together.
+	
+	The results demonstrated that the simultaneous use of preprocessing algorithms provided a \textbf{substantial gain in accuracy}, which increased from \textbf{71.7\%} (without preprocessing) to \textbf{80.19\%} with the combination of all methods. Additionally, \textbf{precision} and \textbf{recall} also showed significant improvements, rising to \textbf{80.19\%}, reflecting a much more robust performance in correctly detecting the plate characters. The \textbf{F1-score}, in turn, followed this trend, reinforcing the effectiveness of the combined approach.
+	
+	Another important aspect was the minimal impact on \textbf{execution time}, which remained practically unchanged when we used all algorithms simultaneously, with the average execution time remaining at \textbf{7.26 seconds}. This demonstrates that it is possible to achieve significant improvements in result quality without sacrificing the model's temporal efficiency, something essential in real-time systems or high-demand environments.
+	
+	This study reveals that by combining different preprocessing techniques, it is possible to mitigate the individual limitations of each method, achieving superior performance in terms of accuracy and reliability. This approach proved particularly effective in challenging scenarios, such as those encountered in vehicle license plate recognition systems under varying lighting and image quality conditions. The simultaneous application of grayscale, CLAHE, and Bilateral Filter optimizes the quality of processed images, resulting in substantial gains for OCR performance.
+	
+	Therefore, this work offers a significant contribution to the field of optical character recognition, demonstrating that the integrated use of preprocessing algorithms can deliver remarkable results without compromising computational efficiency. These findings can be applied in various areas, such as traffic monitoring systems, vehicle automation, and surveillance, offering a practical and effective solution for optimizing OCR models in real-world situations.
+	
+	\section{Future Work}
+	
+	Despite the substantial gains achieved in this study with the simultaneous application of preprocessing algorithms, there are several areas that can still be explored to further improve the results and expand knowledge in the field of optical character recognition (OCR) applied to vehicle license plate recognition.
+	
+	
+	\begin{enumerate}
+		\item \textbf{Optimization of Preprocessing Algorithms for Specific Scenarios}: Although the combination of grayscale, CLAHE, and Bilateral Filter showed a positive synergy, future work could focus on adjusting these algorithms for specific image capture conditions, such as nighttime environments, under intense brightness, or with shadows present. The use of neural networks trained to optimize preprocessing parameters in real-time could be a promising solution to further increase accuracy in complex scenarios.
+		\item \textbf{Exploration of Deep Learning Algorithms for Preprocessing}: Another avenue to explore is the use of deep learning algorithms dedicated to image preprocessing, such as convolutional networks for intelligent noise removal or dynamic contrast adjustment. The study of techniques such as autoencoders and generative adversarial networks (GANs) for enhancing image quality before applying OCR could represent a significant advance, improving both character recognition and system robustness under adverse conditions.
+		\item \textbf{Impact of Preprocessing on Different OCR Models}: While this work focused on EasyOCR, future work could explore how other OCR models, such as Tesseract or deep learning-based solutions, respond to the same set of preprocessing techniques. Direct comparisons between these models could provide valuable insights into which is best suited for different types of environments and image capture conditions, as explored in previous articles such as "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1}.
+		\item \textbf{Testing with a Wide Variety of Plate Images}: The dataset used in this study consisted of a limited set of Brazilian plates. Future research could expand this analysis to include plates from different countries or states, which vary significantly in terms of fonts, colors, and formatting. This would be especially relevant in global traffic monitoring systems or smart city applications, as explored in the study "A Hybrid Deep Learning Algorithm for License Plate Detection and Recognition in Vehicle-to-Vehicle Communications" \cite{b7}.
+		\item \textbf{Real-Time Impact Analysis}: Another promising area of research involves testing the impact of optimized preprocessing in real-time systems, such as traffic monitoring cameras or surveillance drones. Verifying how these systems behave in dynamic, high-volume data situations and studying specialized hardware solutions, such as embedded computing devices, can be essential to ensure that performance improvements observed are applicable to practical scenarios.
+		\item \textbf{Integration of Advanced Computer Vision Techniques}: Future work can also explore the integration of more advanced computer vision techniques, such as \textbf{semantic segmentation} and \textbf{multi-scale object detection}, before applying OCR. These techniques could further improve plate detection and segmentation, reducing the impact of noise or obstacles in the image, such as partially obstructed plates or unfavorable capture angles, topics already discussed in "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13}.
+		\item \textbf{Exploration of Computational Acceleration Methods}: Given the growing use of real-time systems, exploring \textbf{parallelization techniques} and the use of specialized hardware, such as \textbf{GPUs} and \textbf{TPUs}, could be another important avenue for investigation. Combining optimized preprocessing algorithms with accelerated computing platforms could improve the scalability and efficiency of large-scale license plate recognition systems.
+	\end{enumerate}
+	
+	Thus, there is a vast field to be explored in future work, from the optimization of preprocessing algorithms to application in global and real-time contexts. The integration of more advanced artificial intelligence techniques, such as deep learning, combined with intelligent preprocessing, can represent a significant qualitative leap for OCR applied to vehicle plates and other applications. Additionally, studying the impact of different types of hardware and their ability to accelerate processing opens new possibilities for implementing more efficient and robust systems. These future directions can add even more value to the field of computer vision and optical character recognition, expanding its applicability in various industrial and academic sectors.
+	
+	\section{Acknowledgments}
+	
+	I would like to express my sincere thanks to Professor \textbf{Dr. Ronaldo Martins da Costa}, whose support and guidance were essential for the completion of this work. His experience and insights were invaluable throughout the development of this research.
+	
+	I also thank the \textbf{Federal University of Goiás}, for providing the academic environment and the necessary resources that made this study possible. The university's infrastructure and support played a crucial role in the realization of this research.
+	
+	\section{Supplementary Material}
+	
+	All supplementary materials used and produced throughout this work are available for consultation and download in the electronic repository. This includes all cited scientific articles, images, and datasets used, as well as code examples implemented for image preprocessing experiments and vehicle character recognition.
+	
+	You can access all supplementary materials through the following link: https://github.com/faculdade/projeto-final-pdi.
+	
+	The availability of this material is a commitment to open science and collaboration among researchers, allowing other academics and professionals interested in expanding and applying the methodologies described here in different contexts and study scenarios.
+	
+	
+	\begin{thebibliography}{00}
+		\bibitem{b1} D. R. Vedhaviyassh, R. Sudhan, G. Saranya, M. Safa and D. Arun, "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition using Deep Learning Algorithm," 2022 6th International Conference on Electronics, Communication and Aerospace Technology, Coimbatore, India, 2022.
+		\bibitem{b2} S. Dhyani and V. Kumar, "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR," 2023 Global Conference on Information Technologies and Communications (GCITC), Bangalore, India, 2023.
+		\bibitem{b3} T. Mustafa and M. Karabatak, "Deep Learning Model for Automatic Number/License Plate Detection and Recognition System in Campus Gates," 2023 11th International Symposium on Digital Forensics and Security (ISDFS), Chattanooga, TN, USA, 2023.
+		\bibitem{b4} Tranfield D, Denyer D, Smart P (2003) Towards a methodology for developing evidence-informed management knowledge by means of systematic review. British Journal of Management 14:207–222.
+		\bibitem{b5} M. N. M. Faris et al., "Automatic Vehicle License Plate Recognition Using Lightweight Deep Learning Approach," 2023 IEEE International Conference on Consumer Electronics (ICCE), Las Vegas, NV, USA, 2023.
+		\bibitem{b6} S. Kumar et al., "Cognitive Number Plate Recognition using Machine Learning and Data Visualization Techniques," 2023 International Conference on Electronics and Renewable Systems (ICEARS), Chennai, India, 2023.
+		\bibitem{b7} E. A. Patel et al., "A Hybrid Deep Learning Algorithm for License Plate Detection and Recognition in Vehicle-to-Vehicle Communications," 2023 International Conference on Computing, Communication, and Intelligent Systems (ICCCIS), Ghaziabad, India, 2023.
+		\bibitem{b8} D. M. Shah and R. K. Jindal, "License Plate Recognition System Based on Improved YOLOv5 and GRU," 2023 IEEE International Conference on Intelligent Systems and Green Technology (ICISGT), Budapest, Hungary, 2023.
+		\bibitem{b9} L. A. Martins, M. S. Barbosa, M. S. Dias and M. C. Bastos-Filho, "Automatic Vehicle Entry Control System Using Improved ANPR," 2023 IEEE International Conference on Autonomous Systems (ICAS), Montreal, QC, Canada, 2023.
+		\bibitem{b10} G. Pallikonda and V. Sharma, "Design of IoT Based Automatic Number Plate Recognition Using Embedded Linux," 2023 IEEE 11th International Conference on Power Systems (ICPS), Ahmedabad, India, 2023.
+		\bibitem{b11} Z. W. Rahman et al., "Deep Learning-Based Bangladeshi License Plate Recognition System," 2023 4th International Conference on Computing and Information Technology (ICCIT), Bogra, Bangladesh, 2023.
+		\bibitem{b12} S. Mittal et al., "A Framework for Automatic Detection of Traffic Violations Using ANPR in Developing Countries," 2023 4th International Conference on Computing and Information Technology (ICCIT), Bogra, Bangladesh, 2023.
+		\bibitem{b13} A. Kumar, A. Ghosh, and V. Tiwari, "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos," 2023 IEEE International Conference on Advances in Computing, Communication, and Control (ICAC3), Chandigarh, India, 2023.
+		\bibitem{b14} X. Tang et al., "License Plate Detection Using Convolutional Neural Networks," 2023 IEEE International Conference on Consumer Electronics (ICCE), Las Vegas, NV, USA, 2023.
+		\bibitem{b15} M. N. Karatabek, F. C. Tamayoglu and T. Gungor, "Number Plate Detection Using Drone Surveillance: An Emerging Technology in Smart City Systems," 2023 6th International Conference on Information Security and Digital Forensics (ISDF), Antalya, Turkey, 2023.
+		\bibitem{b16} M. Al-Ghuwairi, R. Alhalabi and F. Hussein, "Computer Vision Based Vehicle Detection for Toll Collection System Using Embedded Linux," 2023 4th International Conference on Information Technology (ICIT), Amman, Jordan, 2023.
+	\end{thebibliography}
+	
+\end{document}
+	
