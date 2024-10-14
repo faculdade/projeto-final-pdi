@@ -9,6 +9,10 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{array} % Necessário para colunas de largura fixa
+\usepackage{makecell} % Para permitir a quebra de linha dentro das células
+\usepackage{float}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125em}}
 
@@ -46,7 +50,7 @@ Com o aumento do uso de soluções de Inteligência Artificial, a captura de ima
 
 O conceito inicial de OCR foi desenvolvido na década de 1920 por Emanuel Goldberg, mas foi apenas nos anos 1970 que técnicas mais avançadas começaram a surgir, com a contribuição de Ray Kurzweil. Apesar dos mais de 50 anos de evolução da tecnologia, o OCR ainda enfrenta desafios significativos na detecção de padrões, principalmente quando certas condições não são ideais. Fatores como iluminação inadequada, baixa resolução, ruído nas imagens e distorções causadas por perspectiva ou ângulo continuam a prejudicar o desempenho do OCR. Essas limitações são particularmente evidentes em cenários do mundo real, como o reconhecimento de placas de veículos, onde os sistemas precisam lidar com uma grande diversidade de condições ambientais.
 
-O objetivo deste trabalho é, ciente das limitações mencionadas, responder a questões de pesquisa relacionadas ao estado atual da arte em OCR e testar diversas técnicas de pré-processamento de imagens, como a conversão para Escalas de Cinza, o uso de CLAHE (Contrast Limited Adaptive Histogram Equalization) em imagens RGB, o Filtro Bilateral, entre outros. Essas técnicas serão avaliadas individualmente e combinadas, com o objetivo de determinar quais oferecem os melhores resultados em termos de precisão e eficiência no reconhecimento de placas. Para assegurar a validade dos resultados, utilizamos métricas matemáticas como acurácia, precisão, recall, F1-score, curva ROC, AUC e ANOVA, permitindo uma análise quantitativa rigorosa do desempenho de cada técnica de pré-processamento.
+O objetivo deste trabalho é, ciente das limitações mencionadas, responder a questões de pesquisa relacionadas ao estado atual da arte em OCR e testar diversas técnicas de pré-processamento de imagens, como a conversão para Escalas de Cinza, o uso de CLAHE (Contrast Limited Adaptive Histogram Equalization) em imagens RGB, o Filtro Bilateral, entre outros. Essas técnicas serão avaliadas individualmente e combinadas, com o objetivo de determinar quais oferecem os melhores resultados em termos de precisão e eficiência no reconhecimento de placas. Para assegurar a validade dos resultados, utilizamos métricas estatísticas como acurácia, precisão, recall, F1-score, curva ROC, AUC e ANOVA, permitindo uma análise quantitativa rigorosa do desempenho de cada técnica de pré-processamento.
 
 Para que o trabalho seja replicável, optamos por utilizar um dataset de placas de veículos brasileiras, uma aplicação bastante comum para OCR. A detecção de placas veiculares é amplamente explorada em estudos que envolvem redes neurais, como mostrado em trabalhos recentes, incluindo "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1} e "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR" \cite{b2}. Esses artigos demonstram como diferentes técnicas de OCR podem ser aplicadas ao reconhecimento de placas em condições reais, e servem como base para nossa escolha de dataset e metodologia.
 
@@ -54,33 +58,41 @@ Além disso, a escolha de trabalhar com capturas de uma câmera DSLR em diferent
 
 Portanto, este estudo visa não apenas identificar a técnica de pré-processamento mais eficaz, mas também fornecer um conjunto de boas práticas para pesquisadores que trabalham com reconhecimento de placas e outras aplicações de OCR. Ao combinar um rigoroso processo de validação com um dataset realista e técnicas avançadas de pré-processamento, esperamos oferecer uma contribuição significativa para a área de reconhecimento óptico de caracteres, com potencial impacto nas indústrias de monitoramento de trânsito, segurança veicular e automação urbana. 
 
-\section{Metodologia de Pesquisa}
+\section{Metodologia de Pesquisa e Questões de Pesquisa}
 
 As revisões sistemáticas da literatura vêm ganhando crescente relevância na pesquisa acadêmica, pois seguem uma metodologia estruturada, rigorosa e confiável para a busca e análise de publicações. Esse tipo de revisão permite ao leitor obter uma visão panorâmica do campo de estudo de forma rápida e eficaz \cite{b4}. Utilizadas para aprofundar o conhecimento sobre áreas específicas, as revisões sistemáticas também possibilitam a identificação de lacunas e oportunidades para futuras investigações. O objetivo principal dessa abordagem é localizar, interpretar, avaliar e classificar todos os artigos pertinentes às questões de pesquisa previamente definidas.
 
-Neste estudo, foi adotado um processo de revisão sistemática em cinco etapas, visando mapear a literatura existente, definir perguntas de pesquisa e identificar palavras-chave relevantes. A Figura~\ref{img1} e Figura~\ref{img2} apresenta as fases seguidas durante a revisão, enquanto a Figura~\ref{img3} ilustra o número de artigos analisados ao longo do processo.
+Neste estudo, foi adotado um processo de revisão sistemática em cinco etapas, visando mapear a literatura existente, definir perguntas de pesquisa e identificar palavras-chave relevantes novas. A Figura~\ref{img1} apresenta as fases seguidas durante a revisão, enquanto a Tabela~\ref{tab1} ilustra o número de artigos analisados ao longo do processo.
 
-\begin{figure}[htbp]
-	\centerline{\includegraphics[width=0.5\textwidth]{img1.png}}
+Durante a seleção inicial, utilizando palavras-chave estrategicamente definidas, a \textbf{IEEE Digital Library} retornou um total de \textbf{190 artigos}. Como parte do rigoroso processo de filtragem, aplicamos nossos critérios de exclusão para garantir a relevância e adequação dos estudos, resultando na eliminação de 42 artigos, o que deixou um total de 148 para análise. Na etapa subsequente, removemos artigos duplicados, identificados tanto por erro humano quanto por falhas internas da ferramenta de busca, o que resultou na exclusão de mais dois artigos, restando assim \textbf{146 artigos} que foram cuidadosamente lidos e analisados para a construção deste trabalho.
+
+\begin{table}[H]
+    \caption{Etapas da Revisão Sistemática da Literatura}
+    \begin{center}
+        \begin{tabular}{l|c|c|c|c|}
+            \cline{2-5}
+            & Início & Etapa 1 & Etapa 2 & Etapa 3 \\ \hline
+            \multicolumn{1}{|l|}{Seleção Inicial}       & 190    &         &         &         \\ \hline
+            \multicolumn{1}{|l|}{Critérios de Exclusão} &        & -42     &         &         \\ \hline
+            \multicolumn{1}{|l|}{Remoção de Duplicados} &        &         & -2      &         \\ \hline
+            \multicolumn{1}{|l|}{Resultado Final}       &        &         &         & 146     \\ \hline
+        \end{tabular}
+        \label{tab1}
+    \end{center}
+\end{table}
+
+Esse levantamento sistemático foi conduzido com extremo cuidado, visando garantir que não apenas estivéssemos informados sobre o estado da arte na área de reconhecimento óptico de caracteres (OCR) e processamento de imagens, mas também que pudéssemos identificar de forma precisa as principais questões de pesquisa que ainda estão em aberto. Cada etapa do processo foi elaborada para que pudéssemos obter uma visão abrangente das tendências e desafios atuais no campo, assegurando que nossa pesquisa se alinhasse aos mais recentes desenvolvimentos científicos.
+
+Através dessa abordagem, conseguimos não apenas mapear as contribuições mais relevantes, mas também identificar lacunas na literatura que nos possibilitaram formular um trabalho que realmente contribua para o avanço da área. O cuidado em garantir que os artigos fossem adequados ao nosso tema de estudo foi essencial para nos certificar de que abordamos as principais questões de pesquisa de forma inovadora e rigorosa, consolidando nosso trabalho em uma base científica sólida.
+
+\begin{figure*}[htbp]
+	\centerline{\includegraphics[width=\textwidth]{img1.png}}
 	\caption{Etapas da revisão sistemática da literatura.}
 	\label{img1}
-\end{figure}
+\end{figure*}
 
-\begin{figure}[htbp]
-	\centerline{\includegraphics{img2.png}}
-	\caption{Etapas da revisão sistemática da literatura.}
-	\label{img2}
-\end{figure}
 
-\begin{figure}[htbp]
-	\centerline{\includegraphics{img3.png}}
-	\caption{Número de artigos revisados de acordo com os resultados da pesquisa.}
-	\label{img3}
-\end{figure}
-
-\section{Questões de Pesquisa}
-
-As questões de pesquisa foram formuladas para determinar com precisão o propósito considerando o escopo do estudo. As questões de pesquisa deste estudo são as seguintes:
+As questões de pesquisa foram elaboradas com o objetivo de definir, de maneira precisa, o propósito do estudo, levando em consideração o seu escopo. As questões de pesquisa que norteiam este trabalho são as seguintes:
 
 \begin{itemize}
 	\item \textbf{RQ1:} Como é feita a detecção dos caracteres das placas de veículos no estado atual da arte?
@@ -88,8 +100,6 @@ As questões de pesquisa foram formuladas para determinar com precisão o propó
 	\item \textbf{RQ3:} Como o uso de técnicas de OCR pode garantir uma identificação precisa e eficiente das placas veiculares em diferentes condições de iluminação e ângulos de captura?
 	\item \textbf{RQ4:} Qual é a taxa de acerto do sistema automatizado de reconhecimento de placas veiculares utilizando OCR?
 \end{itemize}
-
-A Figura 3 ilustra o processo de filtragem dos artigos identificados por meio da string de busca utilizada na IEEE Digital Library. Inicialmente, foram encontrados 190 artigos. Após a aplicação dos critérios de exclusão, 42 artigos foram descartados por não atenderem aos requisitos de seleção. Em seguida, todos os artigos duplicados foram removidos, garantindo que apenas os trabalhos relevantes fossem mantidos na seleção final.
 
 \section{Métrica de Avaliação Estatísticas Utilizadas}
 
@@ -218,9 +228,103 @@ A \textbf{AUC (Área Sob a Curva ROC)} é uma medida que resume o desempenho ger
 
 A fórmula da AUC não tem uma representação direta, mas é definida como a área sob a curva ROC, calculada numericamente.
 
+\subsection{ANOVA}
+
+\textbf{ANOVA}, que significa \textbf{Analysis of Variance} (Análise de Variância), é um teste estatístico usado para comparar as médias de mais de dois grupos. Usamos o ANOVA para comparar as taxas de acerto dos diferentes modelos de reconhecimento de placas veiculares.
+
+A ideia do ANOVA é verificar se há uma diferença significativa entre as médias dos diferentes grupos. O teste parte da hipótese nula ($H_0$) de que todas as médias dos grupos são iguais, ou seja, não há diferença real entre as taxas de acerto dos modelos. A hipótese alternativa ($H_1$) é que pelo menos uma média é diferente, o que indicaria que há diferença significativa entre o desempenho dos modelos.
+
+Para entender a fórmula matemática para o cálculo do ANOVA, especificamente para o ANOVA de um fator (também chamado de \textbf{one-way ANOVA}), é importante entender os seguintes termos:
+
+\begin{enumerate}
+    \item \textbf{Soma dos Quadrados (SS)}
+        \begin{itemize}
+            \item \textbf{Soma dos Quadrados Entre os Grupos (SSB)}: Mede a variabilidade entre as médias dos diferentes grupos.
+            \item \textbf{Soma dos Quadrados Dentro dos Grupos (SSW)}: Mede a variabilidade dentro de cada grupo.
+            \item \textbf{Soma Total dos Quadrados (SST)}: Mede a variabilidade total, considerando todos os grupos como uma única amostra.
+        \end{itemize}
+    \item \textbf{Graus de Liberdade (df)}
+         \begin{itemize}
+            \item \textbf{Graus de Liberdade Entre os Grupos (dfB)}: Número de grupos menos 1: \( df_B = k - 1 \), onde \( k \) é o número de grupos.
+            \item \textbf{Graus de Liberdade Dentro dos Grupos (dfW)}: Número total de observações menos o número de grupos: \( df_W = N - k \), onde \( N \) é o número total de observações.
+        \end{itemize}
+    \item \textbf{Média dos Quadrados (MS)}
+         \begin{itemize}
+            \item \textbf{Média dos Quadrados Entre os Grupos (MSB)}: Calculada dividindo a SSB pelos seus graus de liberdade.
+            \item \textbf{Média dos Quadrados Dentro dos Grupos (MSW)}: Calculada dividindo a SSW pelos seus graus de liberdade.
+        \end{itemize}
+\end{enumerate}
+
+O \textbf{valor F} no ANOVA é calculado como a razão entre a variabilidade entre os grupos e a variabilidade dentro dos grupos:
+
+\[
+F = \frac{MSB}{MSW}
+\]
+
+Para calcular o valor F, precisamos seguir os seguintes passos:
+
+\begin{enumerate}
+    \item \textbf{Calcular a Soma dos Quadrados Total (SST)}
+    \begin{itemize}
+        \item SST é a soma da variação de cada valor em relação à média geral.
+        
+        \[
+        SST = \sum_{i=1}^{N} (X_i - \bar{X})^2
+        \]
+        
+        Onde \( X_i \) são os valores observados e \( \bar{X} \) é a média geral.
+     \end{itemize}
+     
+    \item \textbf{Calcular a Soma dos Quadrados Entre os Grupos (SSB)}
+    \begin{itemize}
+        \item SSB mede a variação das médias dos grupos em relação à média geral.
+        
+        \[
+        SSB = \sum_{j=1}^{k} n_j (\bar{X}_j - \bar{X})^2
+        \]
+        
+        Onde \( n_j \) é o número de observações no grupo \( j \), \( \bar{X}_j \) é a média do grupo \( j \), e \( \bar{X} \) é a média geral.
+    \end{itemize}
+    
+    \item \textbf{Calcular a Soma dos Quadrados Dentro dos Grupos (SSW)}
+    \begin{itemize}
+        \item SSW mede a variação dos valores individuais em relação à média de seu grupo.
+         
+        \[
+        SSW = \sum_{j=1}^{k} \sum_{i=1}^{n_j} (X_{ij} - \bar{X}_j)^2
+        \]
+        
+        Onde \( X_{ij} \) são as observações do grupo \( j \), e \( \bar{X}_j \) é a média do grupo \( j \).
+    \end{itemize}
+    
+        \item \textbf{Calcular as Médias dos Quadrados}
+    \begin{itemize}
+        \item \textbf{Média dos Quadrados Entre os Grupos (MSB)}
+        
+        \[
+        MSB = \frac{SSB}{df_B} = \frac{SSB}{k - 1}
+        \]
+        
+        \item \textbf{Média dos Quadrados Dentro dos Grupos (MSW)}
+        
+         \[
+        MSW = \frac{SSW}{df_W} = \frac{SSW}{N - k}
+        \]
+    \end{itemize}
+    
+        \item \textbf{Calcular o Valor F}
+    \begin{itemize}
+        \item Finalmente, o valor F é a razão entre \( MSB \) e \( MSW \):
+        
+        \[
+        F = \frac{MSB}{MSW}
+        \]
+    \end{itemize}
+\end{enumerate}
+
+Um valor F \textbf{alto} indica que a variabilidade entre as médias dos grupos (variabilidade entre grupos) é maior do que a variabilidade dentro dos grupos, sugerindo uma diferença significativa entre os grupos. Um valor F \textbf{baixo} sugere que a variabilidade dentro dos grupos é maior ou comparável à variabilidade entre os grupos, o que indica que as médias dos grupos não diferem significativamente. Resumindo a estatística F no ANOVA mede quão diferente as médias dos grupos são em comparação com a variabilidade dentro dos grupos. A fórmula envolve comparar a variabilidade \textbf{entre os grupos} (quanto as médias dos grupos diferem da média geral) com a variabilidade \textbf{dentro dos grupos} (quanto os valores individuais diferem da média do grupo).
 
 \section{Algorítimos de Pré-processamento Utilizados}
-
 
 \subsection{Nenhum Pré-Processamento - EasyOCR}
 
@@ -280,7 +384,6 @@ Abaixo na Figura~\ref{img6} está a distribuição gaussiana dos tempos de execu
 
 Essa visualização ajuda a identificar se os tempos de execução seguem aproximadamente uma distribuição normal (gaussiana) ou se há desvios significativos.
 
-
 \subsection{Escala Cinza - EasyOCR}
 
 O segundo algoritmo de pré-processamento utilizado neste estudo foi a \textbf{conversão para Escala de Cinza}. O objetivo era avaliar como o dataset se comportaria sob esta técnica e comparar a taxa de \textbf{acurácia} com os resultados obtidos ao utilizar o EasyOCR sem nenhum tipo de pré-processamento. A conversão para escala de cinza é uma técnica simples e amplamente empregada em processamento de imagens, pois reduz a complexidade das informações presentes em uma imagem ao eliminar as cores, retendo apenas a intensidade luminosa dos pixels. No entanto, os resultados indicaram que, para o nosso conjunto de dados, essa técnica não ofereceu melhorias.
@@ -294,7 +397,6 @@ O \textbf{recall} — que corresponde à proporção de placas corretamente dete
 A média harmônica entre precisão e recall, conhecida como \textbf{F1-score}, também sofreu impacto, atingindo \textbf{70,75\%} após a aplicação do pré-processamento de escala de cinza, em comparação aos \textbf{71,7\%} obtidos sem pré-processamento. Essa métrica é particularmente útil em cenários de reconhecimento de placas, onde se busca equilibrar a capacidade do modelo de ser preciso (não gerar falsos positivos) e completo (não deixar de detectar placas). O impacto negativo da conversão para escala de cinza, neste caso, sugere que a cor é uma característica importante no nosso conjunto de dados específico, reforçando a necessidade de avaliar cuidadosamente o contexto de aplicação dessa técnica.
 
 A \textbf{curva ROC (Receiver Operating Characteristic)} e a \textbf{AUC (Área Sob a Curva)} permaneceram inalteradas em relação ao modelo sem pré-processamento, o que já era esperado dado que nosso dataset envolve apenas a predição de uma única placa por vez, sem a necessidade de cálculo probabilístico. Como resultado, o comportamento do modelo, tanto com a aplicação da escala de cinza quanto sem pré-processamento, permaneceu idêntico neste aspecto, conforme observado em outros estudos relacionados, como "License Plate Recognition System Based on Improved YOLOv5 and GRU" \cite{b8}, onde a ROC/AUC também se manteve estável em cenários com poucas classes preditas conforme a Figura~\ref{img7}.
-
 
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=0.5\textwidth]{img7.png}}
@@ -318,7 +420,6 @@ No entanto, ao observarmos os resultados práticos, os dados obtidos desmentem e
 	\label{img8}
 \end{figure}
 
-
 Esse resultado pode ser explicado por vários fatores. Primeiramente, apesar de a escala de cinza reduzir a quantidade de dados em uma imagem, o processo de conversão para tons de cinza adiciona uma etapa extra ao pipeline de processamento de imagens. Além disso, o EasyOCR é otimizado para trabalhar com imagens coloridas, onde a informação de cor pode ajudar o modelo a diferenciar entre o fundo e os caracteres, reduzindo assim o esforço computacional necessário para distinguir as letras ou números presentes na imagem. Conforme descrito em "Cognitive Number Plate Recognition using Machine Learning and Data Visualization Techniques" \cite{b6}, a preservação das características de cor em certos casos pode ser benéfica, mesmo que aumente levemente a quantidade de dados processados, pois pode melhorar a segmentação de caracteres e a clareza geral da imagem. Na Figura~\ref{img9} mostramos a \textbf{Distribuição Gaussiana Dos Tempos De Execução} e fica evidente que não houve impacto de dados outliers.
 
 \begin{figure}[htbp]
@@ -331,10 +432,7 @@ Além disso, o tempo de execução de um modelo de OCR não é determinado apena
 
 Em resumo, embora teoricamente o uso de escala de cinza deva reduzir o tempo de processamento, os dados mostram que o EasyOCR, ao ser utilizado com imagens coloridas, apresenta desempenho superior em termos de velocidade de execução. Esse resultado demonstra que a eficiência do processamento de OCR não depende apenas da quantidade de dados visuais, mas também da otimização do algoritmo para diferentes tipos de imagens.
 
-
-
 \subsection{CLAHE em RGB - EasyOCR}
-
 
 O terceiro algoritmo de pré-processamento que aplicamos neste estudo foi o \textbf{CLAHE (Contrast Limited Adaptive Histogram Equalization)}, uma técnica de equalização de histograma adaptativa, com limitação de contraste, amplamente utilizada para melhorar o contraste em imagens com iluminação não uniforme. O objetivo desta técnica é realçar os detalhes visuais, especialmente em áreas com baixa variação de intensidade luminosa, sem amplificar excessivamente o ruído da imagem. Assim, buscamos avaliar como o dataset se comportaria ao aplicar o CLAHE e compará-lo com os resultados obtidos utilizando o EasyOCR sem nenhum pré-processamento.
 
@@ -345,7 +443,6 @@ Além da acurácia, observamos também uma leve queda na \textbf{precisão}, que
 O \textbf{recall} — que mede a proporção de placas corretamente detectadas em relação ao total de placas presentes — também apresentou uma leve degradação, caindo de \textbf{71,7\%} (sem pré-processamento) para \textbf{70,75\%}. Isso implica que o CLAHE não conseguiu aumentar a sensibilidade do sistema de OCR para detectar todas as placas presentes no conjunto de dados, reforçando a conclusão de que o realce de contraste não foi suficiente para compensar os desafios inerentes às condições de captura das imagens.
 
 Consequentemente, o \textbf{F1-score}, que é a média harmônica entre precisão e recall, também caiu, atingindo \textbf{70,75\%}. Como o F1-score é uma métrica que equilibra esses dois fatores, sua queda reflete a degradação do desempenho geral ao aplicar o CLAHE como pré-processamento. Este resultado é consistente com a literatura, que destaca que o CLAHE pode não ser ideal para todos os tipos de imagens, sendo mais eficaz em cenários onde o contraste é a principal limitação, como mostrado em "A Framework for Automatic Detection of Traffic Violations" \cite{b12}.
-
 
 A \textbf{Curva ROC (Receiver Operating Characteristic)} e a \textbf{AUC (Área Sob a Curva)} são importantes métricas para avaliar a capacidade de um modelo de classificar corretamente as instâncias, especialmente em problemas de classificação binária. No entanto, em nosso estudo, onde cada predição se refere a uma única placa, sem um modelo probabilístico subjacente, essas métricas permaneceram inalteradas. O CLAHE não impactou a curva ROC ou a AUC conforme pode ser visto na conforme a Figura~\ref{img10}, uma vez que a configuração do modelo se manteve a mesma, e a análise foi feita com base em um cenário determinístico. O cálculo da curva ROC e da AUC apresentou resultados idênticos ao modelo original, que utilizou o EasyOCR sem pré-processamento, sugerindo que essas métricas não captaram melhorias ou deteriorações significativas com a aplicação do CLAHE. Conforme observado em "License Plate Recognition Method Based on Convolutional Neural Network" \cite{b14}, em cenários onde se trabalha com a detecção de objetos como placas, as variações na ROC e AUC podem ser mais visíveis em sistemas com diferentes níveis de incerteza, o que não foi o caso no presente estudo.
 
@@ -375,9 +472,7 @@ O \textbf{CLAHE} tem como ponto forte a sua capacidade de melhorar o contraste e
 
 O CLAHE é amplamente utilizado em \textbf{imagens médicas}, onde o realce de detalhes em áreas escuras é essencial, e em \textbf{processamento de imagens de segurança}, onde a visibilidade em condições de baixa iluminação é crítica. No entanto, em \textbf{sistemas de reconhecimento de placas veiculares}, o uso do CLAHE deve ser avaliado com cautela, especialmente em contextos onde as condições de iluminação não são o fator limitante, ou onde há muita variação nas condições de captura, como ângulos, distâncias e ambientes externos.
 
-
 \subsection{Filtro Bilateral - EasyOCR}
-
 
 O quarto algoritmo de pré-processamento utilizado neste estudo foi o \textbf{filtro bilateral}, com o objetivo de verificar como o dataset se comportaria em comparação com o uso do EasyOCR sem nenhum pré-processamento. O filtro bilateral é uma técnica de suavização não linear que preserva as bordas da imagem, reduzindo o ruído sem eliminar os detalhes importantes. Ao contrário de outros filtros de suavização, como o filtro de média ou mediana, o bilateral é eficaz para suavizar áreas homogêneas da imagem ao mesmo tempo em que preserva as bordas, o que pode ser útil para reconhecimento de caracteres em ambientes ruidosos. No entanto, nossos experimentos indicaram que a aplicação do filtro bilateral não trouxe melhorias significativas.
 
@@ -391,14 +486,11 @@ Como consequência das quedas tanto na precisão quanto no recall, o \textbf{F1-
 
 As métricas de \textbf{Curva ROC (Receiver Operating Characteristic)} e \textbf{AUC (Área Sob a Curva)} permaneceram inalteradas após a aplicação do filtro bilateral, tal como ocorreu com os outros métodos de pré-processamento como pode ser observado na Figura~\ref{img13}. Em nosso estudo, como estamos tratando de um dataset com predições binárias para uma única placa por vez e sem um modelo probabilístico, essas métricas não sofreram alterações significativas. A curva ROC e o valor da AUC, que mede a capacidade do modelo em distinguir entre classes positivas e negativas, apresentaram o mesmo comportamento observado ao usar o EasyOCR sem pré-processamento, como também destacado em "Number Plate Detection Using Drone Surveillance" \cite{b15}. Esse resultado sugere que a aplicação do filtro bilateral não teve impacto significativo na capacidade geral de distinção entre caracteres válidos e inválidos pelo modelo.
 
-
 \begin{figure}[htbp]
 	\centerline{\includegraphics[width=0.5\textwidth]{img13.png}}
 	\caption{A curva ROC (Receiver Operating Characteristic) e a AUC (Área Sob a Curva) permaneceram inalteradas }
 	\label{img13}
 \end{figure}
-
-
 
 Outro aspecto importante analisado foi o impacto do pré-processamento no \textbf{tempo de execução}. Ao usar apenas o EasyOCR, o tempo médio de execução foi de \textbf{7,26 segundos}, com uma mediana de \textbf{6,59 segundos}. No entanto, ao aplicar o filtro bilateral, o tempo médio aumentou para \textbf{7,75 segundos}, com uma mediana de \textbf{6,86 segundos} como pode ser observado na Figura~\ref{img14} e Figura~\ref{img15}. Esse aumento no tempo de execução deve-se à complexidade computacional do filtro bilateral, que exige mais processamento para calcular a suavização adaptativa para cada pixel da imagem, preservando ao mesmo tempo as bordas. Embora o impacto no tempo de execução não seja muito grande, ele deve ser considerado em sistemas onde o tempo de resposta é um fator crítico, como em sistemas de monitoramento em tempo real, conforme discutido em "Computer Vision Based Vehicle Detection for Toll Collection System Using Embedded Linux" \cite{b16}.
 
@@ -413,7 +505,6 @@ Outro aspecto importante analisado foi o impacto do pré-processamento no \textb
 	\caption{Distribuição Gaussiana Dos Tempos De Execução}
 	\label{img15}
 \end{figure}
-
 
 O \textbf{filtro bilateral} apresenta algumas \textbf{vantagens significativas} em aplicações onde a redução de ruído é necessária, mas a preservação das bordas é igualmente importante. Ele é particularmente útil em imagens com ruído considerável, onde outras técnicas de suavização, como o filtro mediano ou gaussiano, tenderiam a borrar as bordas, prejudicando a detecção de detalhes importantes. No entanto, uma desvantagem clara do filtro bilateral é que ele pode suavizar excessivamente as bordas quando aplicado de maneira inadequada, resultando em perda de detalhes cruciais, como no reconhecimento de caracteres em placas de veículos. Esse efeito adverso foi observado nos resultados obtidos neste estudo.
 
@@ -431,9 +522,27 @@ O \textbf{recall} — que mede a proporção de placas corretamente detectadas e
 
 Consequentemente, o \textbf{F1-score}, que é a média harmônica entre precisão e recall, também aumentou para \textbf{80,19\%}. Esse aumento mostra que a combinação dos algoritmos proporcionou um melhor equilíbrio entre a capacidade de evitar falsos positivos (precisão) e a detecção correta de todas as placas (recall). O F1-score, como métrica de equilíbrio, reforça que a aplicação dos três algoritmos simultaneamente foi eficiente em melhorar o desempenho geral do modelo.
 
-As métricas \textbf{Curva ROC (Receiver Operating Characteristic)} e \textbf{AUC (Área Sob a Curva)}, que são comumente utilizadas para avaliar a capacidade de discriminação de um modelo, permaneceram inalteradas. Isso ocorre porque nosso conjunto de dados trabalha com predições binárias para uma única placa por vez, sem um componente probabilístico. O comportamento da curva ROC e da AUC se manteve idêntico ao observado no uso do EasyOCR sem pré-processamento, conforme também discutido no artigo "Automatic Vehicle License Plate Recognition Using Lightweight Deep Learning Approach" \cite{b5}. Embora essas métricas não tenham sido impactadas, as melhorias observadas nas outras métricas são evidências do sucesso da aplicação conjunta dos filtros.
+As métricas \textbf{Curva ROC (Receiver Operating Characteristic)} e \textbf{AUC (Área Sob a Curva)}, que são comumente utilizadas para avaliar a capacidade de discriminação de um modelo, permaneceram inalteradas conforme Figura~\ref{img19}. Isso ocorre porque nosso conjunto de dados trabalha com predições binárias para uma única placa por vez, sem um componente probabilístico. O comportamento da curva ROC e da AUC se manteve idêntico ao observado no uso do EasyOCR sem pré-processamento, conforme também discutido no artigo "Automatic Vehicle License Plate Recognition Using Lightweight Deep Learning Approach" \cite{b5}. Embora essas métricas não tenham sido impactadas, as melhorias observadas nas outras métricas são evidências do sucesso da aplicação conjunta dos filtros.
 
-Outro resultado surpreendente foi que o \textbf{tempo de execução} não foi significativamente impactado pela aplicação de todos os algoritmos de pré-processamento em conjunto. O tempo médio de execução permaneceu em \textbf{7,26 segundos}, o mesmo valor observado quando o EasyOCR foi utilizado sem pré-processamento. Já a mediana do tempo de execução subiu levemente de \textbf{6,59 segundos} para \textbf{6,86 segundos} com todos os filtros aplicados simultaneamente. Esse aumento marginal no tempo de execução é justificado pela melhoria substancial na acurácia e precisão, sugerindo que a combinação de algoritmos é eficiente não apenas em termos de qualidade de resultados, mas também em termos de tempo de processamento. O estudo "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13} corrobora esse tipo de comportamento, onde o pré-processamento otimizado não compromete significativamente a eficiência temporal do modelo.
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{img19.png}}
+    \caption{A curva ROC (Receiver Operating Characteristic) e a AUC (Área Sob a Curva) permaneceram inalteradas se comparadas}
+    \label{img19}
+\end{figure}
+
+Outro resultado surpreendente foi que o \textbf{tempo de execução} não foi significativamente impactado pela aplicação de todos os algoritmos de pré-processamento em conjunto conforme pode ser visto na Figura~\ref{img17}. O tempo médio de execução permaneceu em \textbf{7,26 segundos}, o mesmo valor observado quando o EasyOCR foi utilizado sem pré-processamento. Já a mediana do tempo de execução subiu levemente de \textbf{6,59 segundos} para \textbf{6,86 segundos} com todos os filtros aplicados simultaneamente. Esse aumento marginal no tempo de execução é justificado pela melhoria substancial na acurácia e precisão, sugerindo que a combinação de algoritmos é eficiente não apenas em termos de qualidade de resultados, mas também em termos de tempo de processamento. O estudo "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13} corrobora esse tipo de comportamento, onde o pré-processamento otimizado não compromete significativamente a eficiência temporal do modelo. Observe a distribuição gaussiana dos tempos de execução na Figura~\ref{img18}.
+
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{img17.png}}
+    \caption{A média aritmética e a mediana do tempo de execução do modelo}
+    \label{img17}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centerline{\includegraphics[width=0.5\textwidth]{img18.png}}
+    \caption{Distribuição Gaussiana Dos Tempos De Execução}
+    \label{img18}
+\end{figure}
 
 O uso de uma combinação de algoritmos de pré-processamento oferece \textbf{pontos fortes} claros, como o aumento substancial da acurácia e da precisão sem comprometer o tempo de execução. A sinergia entre as diferentes técnicas permite que cada uma compense as limitações da outra, proporcionando um resultado final que supera o uso de qualquer método individualmente. Além disso, essa abordagem é flexível e pode ser aplicada em uma variedade de cenários, desde o reconhecimento de placas de veículos em ambientes urbanos até a digitalização de documentos com baixa qualidade de impressão.
 
@@ -441,6 +550,15 @@ No entanto, um \textbf{ponto fraco} dessa abordagem é que, em algumas situaçõ
 
 Essa abordagem combinada é particularmente eficaz em cenários onde a qualidade das imagens é altamente variável e o ambiente apresenta desafios como iluminação inadequada, placas desgastadas ou ângulos desfavoráveis. Em sistemas de \textbf{reconhecimento automático de placas veiculares} ou em aplicações de \textbf{OCR para ambientes externos}, a combinação de técnicas como escala de cinza, CLAHE e Filtro Bilateral pode ser a solução ideal para garantir a melhor qualidade de reconhecimento possível, mesmo em condições adversas. Essa abordagem também pode ser estendida para o reconhecimento de texto em documentos escaneados de baixa qualidade, conforme explorado em "A Framework for Automatic Detection of Traffic Violations" \cite{b12}.
 
+Por outro lado, no teste ANOVA realizado, o valor da estatística F encontrado foi \textbf{0,913}. Esse valor indica a razão entre a variabilidade entre as médias dos grupos e a variabilidade dentro dos grupos. Um valor de F alto sugeriria que as médias dos diferentes grupos (neste caso, os diferentes modelos) são significativamente diferentes umas das outras. No entanto, o valor de F encontrado aqui não é muito alto, indicando que a variabilidade entre os grupos não é muito maior do que a variabilidade interna, sugerindo que as taxas de acerto dos modelos são bastante semelhantes.
+
+O valor p obtido foi \textbf{0,456}. Esse valor p é utilizado para avaliar se há uma diferença estatisticamente significativa entre os grupos. No contexto usual de uma significância de 0,05 (ou 5\%), um valor p maior que 0,05 significa que não temos evidências suficientes para rejeitar a hipótese nula, que assume que todos os grupos têm médias iguais. Neste caso, o valor p de 0,456 sugere que não há evidência suficiente para afirmar que as taxas de acerto dos modelos são diferentes entre si de maneira estatisticamente significativa.
+
+Assim, podemos concluir que, com base no ANOVA, não há diferença significativa nas taxas de acerto dos modelos que foram comparados. Isso significa que, de acordo com essa análise, todos os modelos parecem ter desempenhos semelhantes na tarefa de reconhecimento de placas.
+
+No entanto, como observamos que a categoria onde todos os pré-processamentos se saiu consistentemente melhor em outras métricas, como tempo de execução, AUC e sensibilidade, é possível concluir que, no contexto geral, o modelo com todos os pré-processamentos apresenta uma vantagem prática. Embora o ANOVA tenha mostrado que a taxa de acerto não é significativamente diferente, o desempenho superior nas demais métricas sugere que essa categoria pode ser a mais eficaz e robusta para a tarefa como um todo.
+
+Portanto, como todas as outras métricas apontam para a superioridade do modelo  com todos pré-processamentos, faz sentido considerá-lo como o melhor de maneira abrangente, mesmo que o ANOVA não tenha mostrado uma diferença estatística clara apenas na taxa de acerto. A interpretação deve levar em conta todos os aspectos do desempenho, e não apenas um único teste estatístico.
 
 \section{Conclusão}
 
@@ -458,11 +576,10 @@ Portanto, este trabalho oferece uma contribuição significativa para a área de
 
 Apesar dos ganhos substanciais alcançados neste estudo com a aplicação simultânea de algoritmos de pré-processamento, existem diversas áreas que ainda podem ser exploradas para aprimorar os resultados e expandir o conhecimento no campo do reconhecimento óptico de caracteres (OCR) aplicado ao reconhecimento de placas veiculares.
 
-
 \begin{enumerate}
-	\item \textbf{Otimização de Algoritmos de Pré-Processamento para Cenários Específicos}: Embora a combinação de escala de cinza, CLAHE e Filtro Bilateral tenha mostrado uma sinergia positiva, futuros trabalhos podem focar em ajustar esses algoritmos para condições específicas de captura de imagens, como em ambientes noturnos, sob intensa luminosidade ou com presença de sombras. O uso de redes neurais treinadas para otimizar os parâmetros de pré-processamento em tempo real pode ser uma solução promissora para aumentar ainda mais a acurácia em cenários complexos.
-	\item \textbf{Exploração de Algoritmos de Deep Learning para Pré-Processamento}: Outro caminho a ser explorado é o uso de algoritmos de deep learning dedicados ao pré-processamento de imagens, como redes convolucionais para a remoção inteligente de ruído ou ajuste dinâmico de contraste. O estudo de técnicas como autoencoders e redes adversariais generativas (GANs) para o aprimoramento da qualidade das imagens antes da aplicação do OCR pode representar um avanço significativo, melhorando tanto o reconhecimento de caracteres quanto a robustez do sistema sob condições adversas.
-	\item \textbf{Impacto do Pré-Processamento em Diferentes Modelos de OCR}: Enquanto este trabalho focou no EasyOCR, trabalhos futuros podem explorar como outros modelos de OCR, como o Tesseract ou soluções baseadas em deep learning, respondem ao mesmo conjunto de pré-processamento. Comparações diretas entre esses modelos podem fornecer insights valiosos sobre qual é o mais adequado para diferentes tipos de ambientes e condições de captura de imagens, como foi explorado em artigos anteriores, como "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1}.
+    \item \textbf{Otimização de Algoritmos de Pré-Processamento para Cenários Específicos}: Embora a combinação de escala de cinza, CLAHE e Filtro Bilateral tenha mostrado uma sinergia positiva, futuros trabalhos podem focar em ajustar esses algoritmos para condições específicas de captura de imagens, como em ambientes noturnos, sob intensa luminosidade ou com presença de sombras. O uso de redes neurais treinadas para otimizar os parâmetros de pré-processamento em tempo real pode ser uma solução promissora para aumentar ainda mais a acurácia em cenários complexos.
+    \item \textbf{Exploração de Algoritmos de Deep Learning para Pré-Processamento}: Outro caminho a ser explorado é o uso de algoritmos de deep learning dedicados ao pré-processamento de imagens, como redes convolucionais para a remoção inteligente de ruído ou ajuste dinâmico de contraste. O estudo de técnicas como autoencoders e redes adversariais generativas (GANs) para o aprimoramento da qualidade das imagens antes da aplicação do OCR pode representar um avanço significativo, melhorando tanto o reconhecimento de caracteres quanto a robustez do sistema sob condições adversas.
+    \item \textbf{Impacto do Pré-Processamento em Diferentes Modelos de OCR}: Enquanto este trabalho focou no EasyOCR, trabalhos futuros podem explorar como outros modelos de OCR, como o Tesseract ou soluções baseadas em deep learning, respondem ao mesmo conjunto de pré-processamento. Comparações diretas entre esses modelos podem fornecer insights valiosos sobre qual é o mais adequado para diferentes tipos de ambientes e condições de captura de imagens, como foi explorado em artigos anteriores, como "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition" \cite{b1}.
 	\item \textbf{Testes com Imagens de Alta Variedade de Placas}: O dataset utilizado neste estudo consistiu em um conjunto limitado de placas brasileiras. Pesquisas futuras poderiam expandir essa análise para incluir placas de diferentes países ou estados, que apresentam variações significativas em termos de fontes, cores e formatação. Isso seria especialmente relevante em sistemas globais de monitoramento de tráfego ou em aplicações de cidades inteligentes, como explorado no estudo "A Hybrid Deep Learning Algorithm for License Plate Detection and Recognition in Vehicle-to-Vehicle Communications" \cite{b7}.
 	\item \textbf{Análise do Impacto em Tempo Real}: Outra área promissora de pesquisa envolve testar o impacto do pré-processamento otimizado em sistemas de tempo real, como câmeras de monitoramento de trânsito ou drones de vigilância. Verificar como esses sistemas se comportam em situações dinâmicas e de alto volume de dados, além de estudar soluções de hardware especializadas, como dispositivos de computação embarcada, pode ser essencial para garantir que as melhorias de desempenho observadas sejam aplicáveis a cenários práticos.
 	\item \textbf{Integração de Técnicas de Visão Computacional Avançada}: Futuros trabalhos também podem explorar a integração de técnicas de visão computacional mais avançadas, como \textbf{segmentação semântica} e \textbf{detecção de objetos em múltiplos níveis de escala}, antes da aplicação do OCR. Essas técnicas poderiam melhorar ainda mais a detecção e segmentação das placas, reduzindo o impacto de ruídos ou obstáculos na imagem, como placas parcialmente obstruídas ou ângulos de captura desfavoráveis, tópicos já discutidos em "StreetOCRCorrect: An Interactive Framework for OCR Corrections in Chaotic Indian Street Videos" \cite{b13}.
@@ -485,7 +602,6 @@ Você pode acessar todo o material suplementar através do seguinte link: https:
 
 A disponibilização desse material é um compromisso com a ciência aberta e a colaboração entre pesquisadores, permitindo que outros acadêmicos e profissionais interessados possam expandir e aplicar as metodologias aqui descritas em diferentes contextos e cenários de estudo.
 
-
 \begin{thebibliography}{00}
 \bibitem{b1} D. R. Vedhaviyassh, R. Sudhan, G. Saranya, M. Safa and D. Arun, "Comparative Analysis of EasyOCR and TesseractOCR for Automatic License Plate Recognition using Deep Learning Algorithm," 2022 6th International Conference on Electronics, Communication and Aerospace Technology, Coimbatore, India, 2022.
 \bibitem{b2} S. Dhyani and V. Kumar, "Real-Time License Plate Detection and Recognition System using YOLOv7x and EasyOCR," 2023 Global Conference on Information Technologies and Communications (GCITC), Bangalore, India, 2023.
@@ -503,13 +619,5 @@ A disponibilização desse material é um compromisso com a ciência aberta e a 
 \bibitem{b14} L. Zhao, F. Dai, F. Li and Z. Zhao, "License Plate Recognition Method based on Convolutional Neural Network," 2023 3rd International Conference on Frontiers of Electronics, Information and Computation Technologies (ICFEICT), Yangzhou, China, 2023, pp. 154-160, doi: 10.1109/ICFEICT59519.2023.00036.
 \bibitem{b15} S. Jain, S. Patel, A. Mehta and J. P. Verma, "Number Plate Detection Using Drone Surveillance," 2022 IEEE 9th Uttar Pradesh Section International Conference on Electrical, Electronics and Computer Engineering (UPCON), Prayagraj, India, 2022, pp. 1-6, doi: 10.1109/UPCON56432.2022.9986360.
 \bibitem{b16} A. Suryatali and V. B. Dharmadhikari, "Computer vision based vehicle detection for toll collection system using embedded Linux," 2015 International Conference on Circuits, Power and Computing Technologies [ICCPCT-2015], Nagercoil, India, 2015, pp. 1-7, doi: 10.1109/ICCPCT.2015.7159412.
-
-
-
-
 \end{thebibliography}
-
-
-
-
 \end{document}
